@@ -8,16 +8,14 @@ export default function App(){
   const [newNome, setNewNome] = useState("");
   const [newCognome, setNewCognome] = useState("");
 
-  function carica(){
+  async function carica(){   //async await 
     setLoading(true);
-    fetch('http://localhost:8080/alunni')
-    .then(response => response.json())
-    .then(function(data){
-      setTimeout(() => {
+    const response = await fetch("http://localhost:8080/alunni");
+    const data = await response.json();
+    setTimeout(() => {
       setAlunni(data);
       setLoading(false);
-      }, 2000);
-    })
+    }, 2000);
   }
 
   function aggiungiAlunno() {
@@ -25,6 +23,10 @@ export default function App(){
   }
 
   function salvaAlunno() {
+      if (!newNome.trim() || !newCognome.trim()) {   //controlllo per dire che tutti i campi sono obbligatori
+        alert("Tutti i campi sono obbligatori!");
+        return;
+      }
     const nuovoAlunno = { nome: newNome, cognome: newCognome };
 
     fetch('http://localhost:8080/alunni', {
@@ -53,7 +55,7 @@ export default function App(){
   function eliminaAlunno(id) {
     const conferma = window.confirm("Sei sicuro di voler eliminare questo alunno?");
     
-    if (!conferma) return; // Se l'utente preme "Annulla", non facciamo nulla
+    if (!conferma) return; // Se l'utente preme "Annulla" non faccio niente
   
     fetch(`http://localhost:8080/alunni/${id}`, {
       method: "DELETE",
@@ -116,12 +118,14 @@ export default function App(){
                   placeholder="Nome"
                   value={newNome}
                   onChange={(e) => setNewNome(e.target.value)}  //e.target.value prende il valore che l'utente sta digitando e lo memorizza in newNome
+                  required
                 />
                 <input
                   type="text"
                   placeholder="Cognome"
                   value={newCognome}
                   onChange={(e) => setNewCognome(e.target.value)}
+                  required
                 />
                 <button onClick={salvaAlunno}>Salva</button>
                 <button onClick={annullaAggiunta}>Annulla</button>
